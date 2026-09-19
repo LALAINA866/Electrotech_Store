@@ -43,12 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// On récupère le terme de recherche (vide s'il n'y en a pas)
+// On récupère le terme de recherche et categorie (vide s'il n'y en a pas)
 $recherche = trim($_GET['recherche'] ?? '');
 $categorie_id = $_GET['categorie'] ?? '';
 
 // Si l'admin a tapé quelque chose → on recherche ; sinon → on liste tout
-if ($recherche !== '') {
+if ($recherche !== '' || $categorie_id !== '') {
     $liste = $produit->rechercher($recherche, $categorie_id);
 } else {
     $liste = $produit->lister();
@@ -110,46 +110,82 @@ $listeFournisseurs = $fournisseur->lister();
               <a href="produits.php">Réinitialiser</a>
               <select name="categorie">
                  <option value="">Toutes les catégories</option>
-                   <?php foreach ($listeCategories as $c): ?>
-                 <option value="<?= $c['id'] ?>"
-                    <?= $c['id'] == $categorie_id ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($c['nom']) ?>
-                 </option>
-    <?php endforeach; ?>
-</select>
+                 <?php foreach ($listeCategories as $c): ?>
+                   <option value="<?= $c['id'] ?>"
+                      <?= $c['id'] == $categorie_id ? 'selected' : '' ?>>
+                      <?= htmlspecialchars($c['nom']) ?>
+                   </option>
+                 <?php endforeach; ?>
+              </select>
         </form>
 
     <h2>Liste des produits</h2>
     <table border="1" cellpadding="6">
-        <tr>
-            <th>Image</th><th>Nom</th><th>Catégorie</th><th>Fournisseur</th>
-            <th>Prix détail</th><th>Prix gros</th><th>Stock</th><th>Actions</th>
-        </tr>
-        <?php foreach ($liste as $p): ?>
+        <thead>
             <tr>
-                <td>
-                    <?php if ($p['image']): ?>
-                        <img src="../uploads/<?= htmlspecialchars($p['image']) ?>" width="50">
-                    <?php endif; ?>
-                </td>
-                <td><?= htmlspecialchars($p['nom']) ?></td>
-                <td><?= htmlspecialchars($p['categorie_nom']) ?></td>
-                <td><?= htmlspecialchars($p['fournisseur_nom']) ?></td>
-                <td><?= htmlspecialchars($p['prix_detail']) ?></td>
-                <td><?= htmlspecialchars($p['prix_gros']) ?></td>
-                <td>
-                    <?= htmlspecialchars($p['quantite_stock']) ?>
-                    <?php if ($p['quantite_stock'] <= $p['seuil_alerte']): ?>
-                        <strong style="color:red;">(stock bas !)</strong>
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <a href="modifier_produit.php?id=<?= $p['id'] ?>">Modifier</a>
-                    <a href="supprimer_produit.php?id=<?= $p['id'] ?>"
-                       onclick="return confirm('Supprimer ce produit ?');">Supprimer</a>
-                </td>
+               <th>Image</th><th>Nom</th><th>Catégorie</th><th>Fournisseur</th>
+               <th>Prix détail</th><th>Prix gros</th><th>Stock</th><th>Actions</th>
             </tr>
-        <?php endforeach; ?>
+        </thead>
+        
+        <tbody id="corps-tableau">
+            <?php foreach ($liste as $p): ?>
+                <tr>
+                    <td>
+                        <?php if ($p['image']): ?>
+                        <img src="../uploads/<?= htmlspecialchars($p['image']) ?>" width="50">
+                        <?php endif; ?>
+                    </td>
+                    <td><?= htmlspecialchars($p['nom']) ?></td>
+                    <td><?= htmlspecialchars($p['categorie_nom']) ?></td>
+                    <td><?= htmlspecialchars($p['fournisseur_nom']) ?></td>
+                    <td><?= htmlspecialchars($p['prix_detail']) ?></td>
+                    <td><?= htmlspecialchars($p['prix_gros']) ?></td>
+                    <td>
+                        <?= htmlspecialchars($p['quantite_stock']) ?>
+                        <?php if ($p['quantite_stock'] <= $p['seuil_alerte']): ?>
+                        <strong style="color:red;">(stock bas !)</strong>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <a href="modifier_produit.php?id=<?= $p['id'] ?>">Modifier</a>
+                        <a href="supprimer_produit.php?id=<?= $p['id'] ?>"
+                        onclick="return confirm('Supprimer ce produit ?');">Supprimer</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
     </table>
+    <script>
+        
+        // 1. On récupère les 3 éléments dont on a besoin
+        const champRecherche = document.querySelector('input[name="recherche"]');
+        const champCategorie = document.querySelector('select[name="categorie"]');
+        const corpsTableau   = document.getElementById('corps-tableau');
+
+        // 2. La fonction qui va chercher les produits sans recharger la page
+        function rechercherAjax() {
+            const terme = champRecherche.value;
+            const cat   = champCategorie.value;
+
+            // On construit l'adresse du fichier de recherche avec les critères
+            const url = 'recherche_produits.php?recherche=' + encodeURIComponent(terme)
+                  + '&categorie=' + encodeURIComponent(cat);
+
+            // On va chercher les lignes sur le serveur
+            fetch(url)
+                .then(reponse => reponse.text())   // on récupère la réponse en texte (les <tr>)
+                .then(html => {
+                    corpsTableau.innerHTML = html;  // on remplace le contenu du tableau
+                })
+                .catch(erreur => {
+                    console.error('Erreur lors de la recherche :', erreur);
+                });
+        }
+
+        // 3. On déclenche la recherche à chaque frappe et à chaque changement de catégorie
+        champRecherche.addEventListener('input', rechercherAjax);
+        champCategorie.addEventListener('change', rechercherAjax);
+    </script>
 </body>
 </html>
