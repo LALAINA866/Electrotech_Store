@@ -1,135 +1,368 @@
--- =====================================================================
---  Base de données : electrotech_store
---  Projet : ElectroTech Store — Plateforme web e-commerce
---  Stagiaire : ANDRIANARIVO Lalaina Bienvenu
---  SGBD : MySQL (moteur InnoDB, encodage utf8mb4)
--- =====================================================================
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Hôte : 127.0.0.1
+-- Généré le : ven. 18 sep. 2026 à 22:36
+-- Version du serveur : 10.4.32-MariaDB
+-- Version de PHP : 8.2.12
 
-CREATE DATABASE IF NOT EXISTS electrotech_store
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE electrotech_store;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- ------------------------------------------------------------------
--- Table : users  (administrateurs et clients)
--- ------------------------------------------------------------------
-CREATE TABLE users (
-  id            INT AUTO_INCREMENT PRIMARY KEY,
-  nom           VARCHAR(100)  NOT NULL,
-  email         VARCHAR(150)  NOT NULL UNIQUE,
-  mot_de_passe  VARCHAR(255)  NOT NULL,          -- stocke un HACHAGE (password_hash), jamais le mot de passe en clair
-  role          ENUM('admin','client') NOT NULL DEFAULT 'client',
-  telephone     VARCHAR(30),
-  adresse       VARCHAR(255),
-  date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
 
--- ------------------------------------------------------------------
--- Table : categories
--- ------------------------------------------------------------------
-CREATE TABLE categories (
-  id          INT AUTO_INCREMENT PRIMARY KEY,
-  nom         VARCHAR(100) NOT NULL,
-  description TEXT
-) ENGINE=InnoDB;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- ------------------------------------------------------------------
--- Table : fournisseurs
--- ------------------------------------------------------------------
-CREATE TABLE fournisseurs (
-  id        INT AUTO_INCREMENT PRIMARY KEY,
-  nom       VARCHAR(150) NOT NULL,
-  email     VARCHAR(150),
-  telephone VARCHAR(30),
-  adresse   VARCHAR(255)
-) ENGINE=InnoDB;
+--
+-- Base de données : `electrotech_store`
+--
 
--- ------------------------------------------------------------------
--- Table : produits
--- ------------------------------------------------------------------
-CREATE TABLE produits (
-  id             INT AUTO_INCREMENT PRIMARY KEY,
-  nom            VARCHAR(150)   NOT NULL,
-  description    TEXT,
-  categorie_id   INT            NOT NULL,
-  fournisseur_id INT,
-  prix_detail    DECIMAL(12,2)  NOT NULL DEFAULT 0,
-  prix_gros      DECIMAL(12,2)  NOT NULL DEFAULT 0,
-  quantite_stock INT            NOT NULL DEFAULT 0,
-  seuil_alerte   INT            NOT NULL DEFAULT 5,
-  image          VARCHAR(255),
-  date_ajout     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (categorie_id)   REFERENCES categories(id),
-  FOREIGN KEY (fournisseur_id) REFERENCES fournisseurs(id)
-) ENGINE=InnoDB;
+-- --------------------------------------------------------
 
--- ------------------------------------------------------------------
--- Table : achats  (entrees de stock, en-tete)
--- ------------------------------------------------------------------
-CREATE TABLE achats (
-  id             INT AUTO_INCREMENT PRIMARY KEY,
-  fournisseur_id INT           NOT NULL,
-  user_id        INT           NOT NULL,          -- l'administrateur qui enregistre l'achat
-  date_achat     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  montant_total  DECIMAL(12,2) NOT NULL DEFAULT 0,
-  FOREIGN KEY (fournisseur_id) REFERENCES fournisseurs(id),
-  FOREIGN KEY (user_id)        REFERENCES users(id)
-) ENGINE=InnoDB;
+--
+-- Structure de la table `achats`
+--
 
--- ------------------------------------------------------------------
--- Table : achat_details  (lignes d'un achat)
--- ------------------------------------------------------------------
-CREATE TABLE achat_details (
-  id            INT AUTO_INCREMENT PRIMARY KEY,
-  achat_id      INT           NOT NULL,
-  produit_id    INT           NOT NULL,
-  quantite      INT           NOT NULL,
-  prix_unitaire DECIMAL(12,2) NOT NULL,
-  FOREIGN KEY (achat_id)   REFERENCES achats(id) ON DELETE CASCADE,
-  FOREIGN KEY (produit_id) REFERENCES produits(id)
-) ENGINE=InnoDB;
+CREATE TABLE `achats` (
+  `id` int(11) NOT NULL,
+  `fournisseur_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `date_achat` timestamp NOT NULL DEFAULT current_timestamp(),
+  `montant_total` decimal(12,2) NOT NULL DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- ------------------------------------------------------------------
--- Table : commandes  (ventes, en-tete)
--- ------------------------------------------------------------------
-CREATE TABLE commandes (
-  id            INT AUTO_INCREMENT PRIMARY KEY,
-  client_id     INT           NOT NULL,
-  date_commande TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  type_vente    ENUM('gros','detail') NOT NULL DEFAULT 'detail',
-  statut        ENUM('en_attente','validee','livree','annulee') NOT NULL DEFAULT 'en_attente',
-  montant_total DECIMAL(12,2) NOT NULL DEFAULT 0,
-  FOREIGN KEY (client_id) REFERENCES users(id)
-) ENGINE=InnoDB;
+-- --------------------------------------------------------
 
--- ------------------------------------------------------------------
--- Table : commande_details  (lignes d'une commande)
--- ------------------------------------------------------------------
-CREATE TABLE commande_details (
-  id            INT AUTO_INCREMENT PRIMARY KEY,
-  commande_id   INT           NOT NULL,
-  produit_id    INT           NOT NULL,
-  quantite      INT           NOT NULL,
-  prix_unitaire DECIMAL(12,2) NOT NULL,
-  FOREIGN KEY (commande_id) REFERENCES commandes(id) ON DELETE CASCADE,
-  FOREIGN KEY (produit_id)  REFERENCES produits(id)
-) ENGINE=InnoDB;
+--
+-- Structure de la table `achat_details`
+--
 
--- ------------------------------------------------------------------
--- Table : factures
--- ------------------------------------------------------------------
-CREATE TABLE factures (
-  id             INT AUTO_INCREMENT PRIMARY KEY,
-  commande_id    INT           NOT NULL,
-  numero_facture VARCHAR(50)   NOT NULL UNIQUE,
-  date_facture   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  montant_total  DECIMAL(12,2) NOT NULL DEFAULT 0,
-  FOREIGN KEY (commande_id) REFERENCES commandes(id)
-) ENGINE=InnoDB;
+CREATE TABLE `achat_details` (
+  `id` int(11) NOT NULL,
+  `achat_id` int(11) NOT NULL,
+  `produit_id` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL,
+  `prix_unitaire` decimal(12,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- ------------------------------------------------------------------
--- Donnees de depart : les 3 categories du sujet
--- ------------------------------------------------------------------
-INSERT INTO categories (nom, description) VALUES
-  ('Electronique',   'Televiseurs, audio, accessoires electroniques...'),
-  ('Informatique',   'Ordinateurs, peripheriques, composants...'),
-  ('Electromenager', 'Refrigerateurs, lave-linge, petit electromenager...');
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `categories`
+--
+
+CREATE TABLE `categories` (
+  `id` int(11) NOT NULL,
+  `nom` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `categories`
+--
+
+INSERT INTO `categories` (`id`, `nom`, `description`) VALUES
+(1, 'Electronique', 'Televiseurs, audio, accessoires electroniques...'),
+(2, 'Informatique', 'Ordinateurs, peripheriques, composants...'),
+(3, 'Electromenager', 'Refrigerateurs, lave-linge, petit electromenager...');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `commandes`
+--
+
+CREATE TABLE `commandes` (
+  `id` int(11) NOT NULL,
+  `client_id` int(11) NOT NULL,
+  `date_commande` timestamp NOT NULL DEFAULT current_timestamp(),
+  `type_vente` enum('gros','detail') NOT NULL DEFAULT 'detail',
+  `statut` enum('en_attente','validee','livree','annulee') NOT NULL DEFAULT 'en_attente',
+  `montant_total` decimal(12,2) NOT NULL DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `commande_details`
+--
+
+CREATE TABLE `commande_details` (
+  `id` int(11) NOT NULL,
+  `commande_id` int(11) NOT NULL,
+  `produit_id` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL,
+  `prix_unitaire` decimal(12,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `factures`
+--
+
+CREATE TABLE `factures` (
+  `id` int(11) NOT NULL,
+  `commande_id` int(11) NOT NULL,
+  `numero_facture` varchar(50) NOT NULL,
+  `date_facture` timestamp NOT NULL DEFAULT current_timestamp(),
+  `montant_total` decimal(12,2) NOT NULL DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `fournisseurs`
+--
+
+CREATE TABLE `fournisseurs` (
+  `id` int(11) NOT NULL,
+  `nom` varchar(150) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telephone` varchar(30) DEFAULT NULL,
+  `adresse` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `fournisseurs`
+--
+
+INSERT INTO `fournisseurs` (`id`, `nom`, `email`, `telephone`, `adresse`) VALUES
+(2, 'xxxxxx', 'xxxxx@gmail.com', '+261332211100', 'XXX'),
+(3, 'yyyyyy', 'yyyyy@gmail.com', '+261370000010', 'YYY'),
+(4, 'zzzzzz', 'zzzzz@gmail.com', '+261341155522', 'ZZZ');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `produits`
+--
+
+CREATE TABLE `produits` (
+  `id` int(11) NOT NULL,
+  `nom` varchar(150) NOT NULL,
+  `description` text DEFAULT NULL,
+  `categorie_id` int(11) NOT NULL,
+  `fournisseur_id` int(11) DEFAULT NULL,
+  `prix_detail` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `prix_gros` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `quantite_stock` int(11) NOT NULL DEFAULT 0,
+  `seuil_alerte` int(11) NOT NULL DEFAULT 5,
+  `image` varchar(255) DEFAULT NULL,
+  `date_ajout` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `produits`
+--
+
+INSERT INTO `produits` (`id`, `nom`, `description`, `categorie_id`, `fournisseur_id`, `prix_detail`, `prix_gros`, `quantite_stock`, `seuil_alerte`, `image`, `date_ajout`) VALUES
+(1, 'Souris', 'noir', 2, 2, 1500.00, 1000.00, 10, 5, '1789670260_img_souris.jpg', '2026-09-17 18:33:21'),
+(3, 'Ordinateur', 'laptop', 2, 3, 2500.00, 2000.00, 23, 5, '1789737469_img_PC.jpg', '2026-09-18 13:17:49'),
+(4, 'Réfrigérateur', '2 portes, gris', 3, 4, 3000.00, 2500.00, 3, 5, '1789754385_img_refrigerateur.jpg', '2026-09-18 17:59:45');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `nom` varchar(100) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `mot_de_passe` varchar(255) NOT NULL,
+  `role` enum('admin','client') NOT NULL DEFAULT 'client',
+  `telephone` varchar(30) DEFAULT NULL,
+  `adresse` varchar(255) DEFAULT NULL,
+  `date_creation` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `users`
+--
+
+INSERT INTO `users` (`id`, `nom`, `email`, `mot_de_passe`, `role`, `telephone`, `adresse`, `date_creation`) VALUES
+(4, 'Andria', 'andria@gmail.com', '$2y$10$RO079PsJhlZo0wuRYUKgqOtp.TaX2zrs4vbNAQoxmx96IO2FSm8VS', 'client', NULL, NULL, '2026-09-16 11:35:14'),
+(5, 'Administrateur', 'admin@electrotech.mg', '$2y$10$IkmcNshg62wFUGEIF4/RLu6rKKQr6TPcWwFon/4ff4aUtYbpX20Iu', 'admin', NULL, NULL, '2026-09-16 15:26:02');
+
+--
+-- Index pour les tables déchargées
+--
+
+--
+-- Index pour la table `achats`
+--
+ALTER TABLE `achats`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fournisseur_id` (`fournisseur_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Index pour la table `achat_details`
+--
+ALTER TABLE `achat_details`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `achat_id` (`achat_id`),
+  ADD KEY `produit_id` (`produit_id`);
+
+--
+-- Index pour la table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Index pour la table `commandes`
+--
+ALTER TABLE `commandes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `client_id` (`client_id`);
+
+--
+-- Index pour la table `commande_details`
+--
+ALTER TABLE `commande_details`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `commande_id` (`commande_id`),
+  ADD KEY `produit_id` (`produit_id`);
+
+--
+-- Index pour la table `factures`
+--
+ALTER TABLE `factures`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `numero_facture` (`numero_facture`),
+  ADD KEY `commande_id` (`commande_id`);
+
+--
+-- Index pour la table `fournisseurs`
+--
+ALTER TABLE `fournisseurs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Index pour la table `produits`
+--
+ALTER TABLE `produits`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `categorie_id` (`categorie_id`),
+  ADD KEY `fournisseur_id` (`fournisseur_id`);
+
+--
+-- Index pour la table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- AUTO_INCREMENT pour les tables déchargées
+--
+
+--
+-- AUTO_INCREMENT pour la table `achats`
+--
+ALTER TABLE `achats`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `achat_details`
+--
+ALTER TABLE `achat_details`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT pour la table `commandes`
+--
+ALTER TABLE `commandes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `commande_details`
+--
+ALTER TABLE `commande_details`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `factures`
+--
+ALTER TABLE `factures`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `fournisseurs`
+--
+ALTER TABLE `fournisseurs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT pour la table `produits`
+--
+ALTER TABLE `produits`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT pour la table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- Contraintes pour les tables déchargées
+--
+
+--
+-- Contraintes pour la table `achats`
+--
+ALTER TABLE `achats`
+  ADD CONSTRAINT `achats_ibfk_1` FOREIGN KEY (`fournisseur_id`) REFERENCES `fournisseurs` (`id`),
+  ADD CONSTRAINT `achats_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Contraintes pour la table `achat_details`
+--
+ALTER TABLE `achat_details`
+  ADD CONSTRAINT `achat_details_ibfk_1` FOREIGN KEY (`achat_id`) REFERENCES `achats` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `achat_details_ibfk_2` FOREIGN KEY (`produit_id`) REFERENCES `produits` (`id`);
+
+--
+-- Contraintes pour la table `commandes`
+--
+ALTER TABLE `commandes`
+  ADD CONSTRAINT `commandes_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `users` (`id`);
+
+--
+-- Contraintes pour la table `commande_details`
+--
+ALTER TABLE `commande_details`
+  ADD CONSTRAINT `commande_details_ibfk_1` FOREIGN KEY (`commande_id`) REFERENCES `commandes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `commande_details_ibfk_2` FOREIGN KEY (`produit_id`) REFERENCES `produits` (`id`);
+
+--
+-- Contraintes pour la table `factures`
+--
+ALTER TABLE `factures`
+  ADD CONSTRAINT `factures_ibfk_1` FOREIGN KEY (`commande_id`) REFERENCES `commandes` (`id`);
+
+--
+-- Contraintes pour la table `produits`
+--
+ALTER TABLE `produits`
+  ADD CONSTRAINT `produits_ibfk_1` FOREIGN KEY (`categorie_id`) REFERENCES `categories` (`id`),
+  ADD CONSTRAINT `produits_ibfk_2` FOREIGN KEY (`fournisseur_id`) REFERENCES `fournisseurs` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
