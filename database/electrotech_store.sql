@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : sam. 19 sep. 2026 à 22:56
+-- Généré le : lun. 21 sep. 2026 à 22:36
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -35,6 +35,14 @@ CREATE TABLE `achats` (
   `montant_total` decimal(12,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `achats`
+--
+
+INSERT INTO `achats` (`id`, `fournisseur_id`, `user_id`, `date_achat`, `montant_total`) VALUES
+(4, 4, 5, '2026-09-21 15:26:44', 58800.00),
+(5, 2, 5, '2026-09-21 20:19:44', 40200.00);
+
 -- --------------------------------------------------------
 
 --
@@ -48,6 +56,15 @@ CREATE TABLE `achat_details` (
   `quantite` int(11) NOT NULL,
   `prix_unitaire` decimal(12,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `achat_details`
+--
+
+INSERT INTO `achat_details` (`id`, `achat_id`, `produit_id`, `quantite`, `prix_unitaire`) VALUES
+(10, 4, 4, 10, 5880.00),
+(11, 5, 3, 2, 2250.00),
+(12, 5, 4, 7, 5100.00);
 
 -- --------------------------------------------------------
 
@@ -161,9 +178,9 @@ CREATE TABLE `produits` (
 --
 
 INSERT INTO `produits` (`id`, `nom`, `description`, `categorie_id`, `fournisseur_id`, `prix_detail`, `prix_gros`, `quantite_stock`, `seuil_alerte`, `image`, `date_ajout`) VALUES
-(1, 'Souris', 'noir', 2, 2, 1500.00, 1000.00, 10, 5, '1789670260_img_souris.jpg', '2026-09-17 18:33:21'),
-(3, 'Ordinateur', 'laptop', 2, 3, 2500.00, 2000.00, 23, 5, '1789737469_img_PC.jpg', '2026-09-18 13:17:49'),
-(4, 'Réfrigérateur', '2 portes, gris', 3, 4, 3000.00, 2500.00, 3, 5, '1789754385_img_refrigerateur.jpg', '2026-09-18 17:59:45');
+(1, 'Souris', 'noir', 2, 2, 1500.00, 1000.00, 25, 5, '1789670260_img_souris.jpg', '2026-09-17 18:33:21'),
+(3, 'Ordinateur', 'laptop', 2, 3, 2500.00, 2002.00, 40, 5, '1789737469_img_PC.jpg', '2026-09-18 13:17:49'),
+(4, 'Réfrigérateur', '2 portes, gris', 3, 4, 3000.00, 2400.00, 20, 5, '1789754385_img_refrigerateur.jpg', '2026-09-18 17:59:45');
 
 -- --------------------------------------------------------
 
@@ -268,13 +285,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `achats`
 --
 ALTER TABLE `achats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `achat_details`
 --
 ALTER TABLE `achat_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT pour la table `categories`
