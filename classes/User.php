@@ -49,5 +49,12 @@ class User
         }
         return false; // email inconnu ou mauvais mot de passe
     }
+
+        // Lister uniquement les utilisateurs de rôle "client"
+    public function listerClients()
+    {
+        $sql = "SELECT id, nom FROM users WHERE role = 'client' ORDER BY nom";
+        return $this->pdo->query($sql)->fetchAll();
+    }
 }
 ?>

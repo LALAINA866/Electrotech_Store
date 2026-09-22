@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 21 sep. 2026 à 22:36
+-- Généré le : mar. 22 sep. 2026 à 22:09
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -102,6 +102,15 @@ CREATE TABLE `commandes` (
   `montant_total` decimal(12,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `commandes`
+--
+
+INSERT INTO `commandes` (`id`, `client_id`, `date_commande`, `type_vente`, `statut`, `montant_total`) VALUES
+(1, 4, '2026-09-22 19:38:32', 'detail', 'en_attente', 38950.00),
+(2, 4, '2026-09-22 19:45:43', 'detail', 'en_attente', 44020.00),
+(4, 6, '2026-09-22 19:52:45', 'detail', 'en_attente', 23250.00);
+
 -- --------------------------------------------------------
 
 --
@@ -115,6 +124,18 @@ CREATE TABLE `commande_details` (
   `quantite` int(11) NOT NULL,
   `prix_unitaire` decimal(12,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `commande_details`
+--
+
+INSERT INTO `commande_details` (`id`, `commande_id`, `produit_id`, `quantite`, `prix_unitaire`) VALUES
+(1, 1, 3, 9, 2550.00),
+(2, 1, 4, 5, 3200.00),
+(3, 2, 3, 11, 2570.00),
+(4, 2, 4, 5, 3150.00),
+(5, 4, 3, 5, 2700.00),
+(6, 4, 4, 3, 3250.00);
 
 -- --------------------------------------------------------
 
@@ -179,8 +200,8 @@ CREATE TABLE `produits` (
 
 INSERT INTO `produits` (`id`, `nom`, `description`, `categorie_id`, `fournisseur_id`, `prix_detail`, `prix_gros`, `quantite_stock`, `seuil_alerte`, `image`, `date_ajout`) VALUES
 (1, 'Souris', 'noir', 2, 2, 1500.00, 1000.00, 25, 5, '1789670260_img_souris.jpg', '2026-09-17 18:33:21'),
-(3, 'Ordinateur', 'laptop', 2, 3, 2500.00, 2002.00, 40, 5, '1789737469_img_PC.jpg', '2026-09-18 13:17:49'),
-(4, 'Réfrigérateur', '2 portes, gris', 3, 4, 3000.00, 2400.00, 20, 5, '1789754385_img_refrigerateur.jpg', '2026-09-18 17:59:45');
+(3, 'Ordinateur', 'laptop', 2, 3, 2500.00, 2002.00, 15, 5, '1789737469_img_PC.jpg', '2026-09-18 13:17:49'),
+(4, 'Réfrigérateur', '2 portes, gris', 3, 4, 3000.00, 2400.00, 7, 5, '1789754385_img_refrigerateur.jpg', '2026-09-18 17:59:45');
 
 -- --------------------------------------------------------
 
@@ -205,7 +226,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `nom`, `email`, `mot_de_passe`, `role`, `telephone`, `adresse`, `date_creation`) VALUES
 (4, 'Andria', 'andria@gmail.com', '$2y$10$RO079PsJhlZo0wuRYUKgqOtp.TaX2zrs4vbNAQoxmx96IO2FSm8VS', 'client', NULL, NULL, '2026-09-16 11:35:14'),
-(5, 'Administrateur', 'admin@electrotech.mg', '$2y$10$IkmcNshg62wFUGEIF4/RLu6rKKQr6TPcWwFon/4ff4aUtYbpX20Iu', 'admin', NULL, NULL, '2026-09-16 15:26:02');
+(5, 'Administrateur', 'admin@electrotech.mg', '$2y$10$IkmcNshg62wFUGEIF4/RLu6rKKQr6TPcWwFon/4ff4aUtYbpX20Iu', 'admin', NULL, NULL, '2026-09-16 15:26:02'),
+(6, 'userx', 'userx@gmail.com', '$2y$10$aaHESKjtA4dVNJkCwfeqvevXlAyz2PsEQNr9OWJ7Gwe6Z/8/1Y8PW', 'client', NULL, NULL, '2026-09-22 19:32:40');
 
 --
 -- Index pour les tables déchargées
@@ -303,13 +325,13 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT pour la table `commandes`
 --
 ALTER TABLE `commandes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `commande_details`
 --
 ALTER TABLE `commande_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT pour la table `factures`
@@ -333,7 +355,7 @@ ALTER TABLE `produits`
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Contraintes pour les tables déchargées
