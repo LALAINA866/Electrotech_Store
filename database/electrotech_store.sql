@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 22 sep. 2026 à 22:09
+-- Généré le : mer. 23 sep. 2026 à 21:20
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -150,6 +150,13 @@ CREATE TABLE `factures` (
   `date_facture` timestamp NOT NULL DEFAULT current_timestamp(),
   `montant_total` decimal(12,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `factures`
+--
+
+INSERT INTO `factures` (`id`, `commande_id`, `numero_facture`, `date_facture`, `montant_total`) VALUES
+(1, 4, 'FACT-20260923-4', '2026-09-23 18:57:59', 23250.00);
 
 -- --------------------------------------------------------
 
@@ -307,7 +314,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `achats`
 --
 ALTER TABLE `achats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT pour la table `achat_details`
@@ -325,7 +332,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT pour la table `commandes`
 --
 ALTER TABLE `commandes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `commande_details`
@@ -337,7 +344,7 @@ ALTER TABLE `commande_details`
 -- AUTO_INCREMENT pour la table `factures`
 --
 ALTER TABLE `factures`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `fournisseurs`

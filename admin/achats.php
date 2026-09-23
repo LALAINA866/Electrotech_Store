@@ -22,9 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($fournisseur_id === "") {
         $message = "Veuillez choisir un fournisseur.";
     } else {
-        if ($achat->enregistrer($fournisseur_id, $user_id, $produits, $quantites, $prix)) {
+        $resultat = $achat->enregistrer($fournisseur_id, $user_id, $produits, $quantites, $prix);
+        if ($resultat === true) {
             $message = "Achat enregistré et stock mis à jour !";
-        } else {
+        } elseif($resultat === "aucun_produit") {
+            $message = "Veuillez ajouter au moins un produit à l'achat.";
+        } else{
             $message = "Erreur lors de l'enregistrement.";
         }
     }

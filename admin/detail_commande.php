@@ -24,6 +24,7 @@ $lignes = $commande->details($id);
 <body>
     <h1>Détail de la vente n°<?= htmlspecialchars($entete['id']) ?></h1>
     <p><a href="commandes.php">← Retour aux ventes</a></p>
+    <p><a href="facture_pdf.php?id=<?= $entete['id'] ?>" target="_blank">📄 Générer la facture (PDF)</a></p>
 
     <p>
         <strong>Client :</strong> <?= htmlspecialchars($entete['client_nom']) ?><br>

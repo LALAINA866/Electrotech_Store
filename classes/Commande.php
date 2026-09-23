@@ -14,6 +14,8 @@ class Commande
         try {
             $this->pdo->beginTransaction();
 
+            $nbLignesValides = 0;
+
             // 1. Vérifier d'abord que le stock est suffisant pour chaque produit
             for ($i = 0; $i < count($produits); $i++) {
                 $produit_id = $produits[$i];
@@ -22,6 +24,8 @@ class Commande
                 if ($produit_id === "" || $quantite <= 0) {
                     continue;
                 }
+
+                $nbLignesValides++;
 
                 // On lit le stock actuel du produit
                 $sql = "SELECT quantite_stock FROM produits WHERE id = :p";
@@ -36,6 +40,12 @@ class Commande
                 }
             }
 
+            // refuser si aucun produit valide
+            if ($nbLignesValides === 0) {
+            $this->pdo->rollBack();
+            return "aucun_produit";
+            }
+            
             // 2. Créer l'en-tête de la commande (montant à 0 pour l'instant)
             $sql = "INSERT INTO commandes (client_id, type_vente, montant_total)
                     VALUES (:c, :t, 0)";

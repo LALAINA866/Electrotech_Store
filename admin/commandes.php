@@ -27,6 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Vente enregistrée et stock mis à jour !";
         } elseif ($resultat === "stock_insuffisant") {
             $message = "Stock insuffisant pour un ou plusieurs produits. Vente annulée.";
+        } elseif($resultat === "aucun_produit") {
+             $message = "Veuillez ajouter au moins un produit à la vente.";
         } else {
             $message = "Erreur lors de l'enregistrement.";
         }

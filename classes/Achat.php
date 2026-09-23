@@ -34,6 +34,8 @@ class Achat
 
             $montantTotal = 0;
 
+            $nbLignesValides = 0;
+
             // 2. Parcourir chaque ligne de produit
             for ($i = 0; $i < count($produits); $i++) {
                 $produit_id    = $produits[$i];
@@ -44,6 +46,8 @@ class Achat
                 if ($produit_id === "" || $quantite <= 0) {
                     continue;
                 }
+
+                $nbLignesValides++;
 
                 // Insérer la ligne de détail
                 $sql = "INSERT INTO achat_details (achat_id, produit_id, quantite, prix_unitaire)
@@ -58,6 +62,12 @@ class Achat
                 $req->execute([':q' => $quantite, ':p' => $produit_id]);
 
                 $montantTotal += $quantite * $prix_unitaire;
+            }
+
+            // refuser si aucun produit valide
+            if ($nbLignesValides === 0) {
+            $this->pdo->rollBack();
+            return "aucun_produit";
             }
 
             // 3. Mettre à jour le montant total réel
