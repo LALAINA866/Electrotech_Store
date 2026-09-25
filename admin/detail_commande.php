@@ -4,8 +4,10 @@ exigerAdmin();
 
 require_once '../config/database.php';
 require_once '../classes/Commande.php';
+require_once '../classes/Monnaie.php';
 
 $commande = new Commande($pdo);
+$monnaie = new Monnaie($pdo);
 
 $id = $_GET['id'] ?? null;
 if (!$id) { header('Location: commandes.php'); exit; }
@@ -14,6 +16,7 @@ $entete = $commande->trouver($id);
 if (!$entete) { header('Location: commandes.php'); exit; }
 
 $lignes = $commande->details($id);
+$listeMonnaies = $monnaie->lister();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -24,7 +27,20 @@ $lignes = $commande->details($id);
 <body>
     <h1>Détail de la vente n°<?= htmlspecialchars($entete['id']) ?></h1>
     <p><a href="commandes.php">← Retour aux ventes</a></p>
-    <p><a href="facture_pdf.php?id=<?= $entete['id'] ?>" target="_blank">📄 Générer la facture (PDF)</a></p>
+    <h3>Générer la facture</h3>
+    <form method="GET" action="facture_pdf.php" target="_blank">
+        <input type="hidden" name="id" value="<?= $entete['id'] ?>">
+            <label>Monnaie :
+                <select name="monnaie_id">
+                    <?php foreach ($listeMonnaies as $m): ?>
+                        <option value="<?= $m['id'] ?>">
+                            <?= htmlspecialchars($m['nom']) ?> (<?= htmlspecialchars($m['symbole']) ?>)
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+            <button type="submit">Générer la facture (PDF)</button>
+    </form>
 
     <p>
         <strong>Client :</strong> <?= htmlspecialchars($entete['client_nom']) ?><br>

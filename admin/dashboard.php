@@ -17,5 +17,6 @@ exigerAdmin(); // ← cette seule ligne protège toute la page
     <p><a href="produits.php">Gérer les produits</a></p>
     <p><a href="achats.php">Gérer les achats</a></p>
     <p><a href="commandes.php">Gérer les ventes</a></p>
+    <p><a href="monnaies.php">Gérer les monnaies</a></p>
 </body>
 </html>

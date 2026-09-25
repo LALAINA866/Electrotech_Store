@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 23 sep. 2026 à 21:20
+-- Généré le : ven. 25 sep. 2026 à 21:45
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -156,7 +156,9 @@ CREATE TABLE `factures` (
 --
 
 INSERT INTO `factures` (`id`, `commande_id`, `numero_facture`, `date_facture`, `montant_total`) VALUES
-(1, 4, 'FACT-20260923-4', '2026-09-23 18:57:59', 23250.00);
+(1, 4, 'FACT-20260923-4', '2026-09-23 18:57:59', 23250.00),
+(2, 1, 'FACT-20260925-1', '2026-09-25 15:25:07', 38950.00),
+(3, 2, 'FACT-20260925-2', '2026-09-25 18:45:27', 44020.00);
 
 -- --------------------------------------------------------
 
@@ -180,6 +182,28 @@ INSERT INTO `fournisseurs` (`id`, `nom`, `email`, `telephone`, `adresse`) VALUES
 (2, 'xxxxxx', 'xxxxx@gmail.com', '+261332211100', 'XXX'),
 (3, 'yyyyyy', 'yyyyy@gmail.com', '+261370000010', 'YYY'),
 (4, 'zzzzzz', 'zzzzz@gmail.com', '+261341155522', 'ZZZ');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `monnaies`
+--
+
+CREATE TABLE `monnaies` (
+  `id` int(11) NOT NULL,
+  `nom` varchar(50) NOT NULL,
+  `symbole` varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `monnaies`
+--
+
+INSERT INTO `monnaies` (`id`, `nom`, `symbole`) VALUES
+(1, 'Euro', 'EUR'),
+(2, 'Dollar', 'USD'),
+(3, 'Ariary', 'Ar'),
+(4, 'Dinar', 'DT');
 
 -- --------------------------------------------------------
 
@@ -292,6 +316,12 @@ ALTER TABLE `fournisseurs`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Index pour la table `monnaies`
+--
+ALTER TABLE `monnaies`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Index pour la table `produits`
 --
 ALTER TABLE `produits`
@@ -344,12 +374,18 @@ ALTER TABLE `commande_details`
 -- AUTO_INCREMENT pour la table `factures`
 --
 ALTER TABLE `factures`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `fournisseurs`
 --
 ALTER TABLE `fournisseurs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT pour la table `monnaies`
+--
+ALTER TABLE `monnaies`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
