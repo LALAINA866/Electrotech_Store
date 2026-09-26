@@ -25,11 +25,28 @@ class Monnaie
     }
 
     // Ajouter une nouvelle monnaie
-    public function ajouter($nom, $symbole)
+    // $taux : valeur de 1 unité de la monnaie de référence dans cette monnaie
+    // $decimales : nombre de chiffres après la virgule (2 pour l'euro, 3 pour le dinar)
+    public function ajouter($nom, $symbole, $taux = 1, $decimales = 2)
     {
-        $sql = "INSERT INTO monnaies (nom, symbole) VALUES (:nom, :sym)";
+        $sql = "INSERT INTO monnaies (nom, symbole, taux, decimales)
+                VALUES (:nom, :sym, :taux, :dec)";
         $req = $this->pdo->prepare($sql);
-        return $req->execute([':nom' => $nom, ':sym' => $symbole]);
+        return $req->execute([
+            ':nom'  => $nom,
+            ':sym'  => $symbole,
+            ':taux' => $taux,
+            ':dec'  => $decimales
+        ]);
+    }
+
+    // Trouver une monnaie par son symbole (sert à retrouver la monnaie de référence)
+    public function trouverParSymbole($symbole)
+    {
+        $sql = "SELECT * FROM monnaies WHERE symbole = :sym";
+        $req = $this->pdo->prepare($sql);
+        $req->execute([':sym' => $symbole]);
+        return $req->fetch();
     }
 
     // Supprimer une monnaie

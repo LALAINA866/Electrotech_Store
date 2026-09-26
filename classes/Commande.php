@@ -42,10 +42,10 @@ class Commande
 
             // refuser si aucun produit valide
             if ($nbLignesValides === 0) {
-            $this->pdo->rollBack();
-            return "aucun_produit";
+                $this->pdo->rollBack();
+                return "aucun_produit";
             }
-            
+
             // 2. Créer l'en-tête de la commande (montant à 0 pour l'instant)
             $sql = "INSERT INTO commandes (client_id, type_vente, montant_total)
                     VALUES (:c, :t, 0)";
@@ -69,8 +69,12 @@ class Commande
                 $sql = "INSERT INTO commande_details (commande_id, produit_id, quantite, prix_unitaire)
                         VALUES (:cmd, :p, :q, :pu)";
                 $req = $this->pdo->prepare($sql);
-                $req->execute([':cmd' => $commande_id, ':p' => $produit_id,
-                               ':q' => $quantite, ':pu' => $prix_unitaire]);
+                $req->execute([
+                    ':cmd' => $commande_id,
+                    ':p' => $produit_id,
+                    ':q' => $quantite,
+                    ':pu' => $prix_unitaire
+                ]);
 
                 // AUTOMATISATION : DIMINUER le stock 
                 $sql = "UPDATE produits SET quantite_stock = quantite_stock - :q WHERE id = :p";
@@ -106,7 +110,8 @@ class Commande
     // Trouver une commande par son id
     public function trouver($id)
     {
-        $sql = "SELECT c.*, u.nom AS client_nom
+        $sql = "SELECT c.*, u.nom AS client_nom, u.email AS client_email,
+                       u.telephone AS client_telephone, u.adresse AS client_adresse
                 FROM commandes c
                 LEFT JOIN users u ON c.client_id = u.id
                 WHERE c.id = :id";
@@ -118,7 +123,8 @@ class Commande
     // Les lignes de détail d'une commande
     public function details($commande_id)
     {
-        $sql = "SELECT cd.*, p.nom AS produit_nom
+        $sql = "SELECT cd.*, p.nom AS produit_nom, p.description AS produit_description,
+                       p.image AS produit_image
                 FROM commande_details cd
                 LEFT JOIN produits p ON cd.produit_id = p.id
                 WHERE cd.commande_id = :cmd";
@@ -127,4 +133,3 @@ class Commande
         return $req->fetchAll();
     }
 }
-?>

@@ -38,5 +38,46 @@ class Facture
         $req->execute([':id' => $id]);
         return $req->fetch();
     }
+
+
+    /**
+     * Calcule les montants de la facture dans la monnaie choisie.
+     * - Les prix en base sont HT, dans la monnaie de référence.
+     * - On les convertit avec le taux de la monnaie choisie.
+     * - On applique la TVA ($tauxTva, ex. : 0.20 pour 20 %).
+     */
+    public function calculer($lignes, $taux, $decimales, $tauxTva)
+    {
+        $resultat = [];
+        $totalHt  = 0;
+
+        foreach ($lignes as $l) {
+            $prixHt  = round($l['prix_unitaire'] * $taux, $decimales);   // prix unitaire converti
+            $ligneHt = round($prixHt * $l['quantite'], $decimales);
+            $tva     = round($ligneHt * $tauxTva, $decimales);
+
+            $resultat[] = [
+                'nom'         => $l['produit_nom'],
+                'description' => $l['produit_description'] ?? '',
+                'image'       => $l['produit_image'] ?? null,
+                'quantite'    => $l['quantite'],
+                'prix_ht'     => $prixHt,
+                'total_ht'    => $ligneHt,
+                'tva'         => $tva,
+                'total_ttc'   => $ligneHt + $tva,
+            ];
+            $totalHt += $ligneHt;
+        }
+
+        $totalTva = round($totalHt * $tauxTva, $decimales);
+
+        return [
+            'lignes' => $resultat,
+            'totaux' => [
+                'ht'  => $totalHt,
+                'tva' => $totalTva,
+                'ttc' => $totalHt + $totalTva,
+            ],
+        ];
+    }
 }
-?>

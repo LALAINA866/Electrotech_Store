@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 25 sep. 2026 à 21:45
+-- Généré le : sam. 26 sep. 2026 à 22:25
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -192,18 +192,20 @@ INSERT INTO `fournisseurs` (`id`, `nom`, `email`, `telephone`, `adresse`) VALUES
 CREATE TABLE `monnaies` (
   `id` int(11) NOT NULL,
   `nom` varchar(50) NOT NULL,
-  `symbole` varchar(10) NOT NULL
+  `symbole` varchar(10) NOT NULL,
+  `taux` decimal(15,6) NOT NULL DEFAULT 1.000000,
+  `decimales` tinyint(4) NOT NULL DEFAULT 2
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `monnaies`
 --
 
-INSERT INTO `monnaies` (`id`, `nom`, `symbole`) VALUES
-(1, 'Euro', 'EUR'),
-(2, 'Dollar', 'USD'),
-(3, 'Ariary', 'Ar'),
-(4, 'Dinar', 'DT');
+INSERT INTO `monnaies` (`id`, `nom`, `symbole`, `taux`, `decimales`) VALUES
+(1, 'Euro', 'EUR', 0.290000, 2),
+(2, 'Dollar', 'USD', 0.340000, 2),
+(3, 'Ariary', 'Ar', 1500.000000, 0),
+(4, 'Dinar', 'DT', 1.000000, 3);
 
 -- --------------------------------------------------------
 
@@ -386,7 +388,7 @@ ALTER TABLE `fournisseurs`
 -- AUTO_INCREMENT pour la table `monnaies`
 --
 ALTER TABLE `monnaies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `produits`
